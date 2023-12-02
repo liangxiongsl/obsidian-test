@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/docs/obsidian/","tags":["gardenEntry"]}
+{"dg-publish":true,"permalink":"/docs/obsidian/","tags":["gardenEntry","gardenEntry"]}
 ---
 
 
