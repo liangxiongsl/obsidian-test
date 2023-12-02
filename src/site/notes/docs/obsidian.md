@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/docs/obsidian/","tags":["gardenEntry","gardenEntry"]}
+{"dg-publish":true,"permalink":"/docs/obsidian/","tags":["gardenEntry"]}
 ---
 
 
@@ -42,6 +42,7 @@ obsidian拥有强大的插件生态，(前段)程序员友好，关系图谱神�
 	3. 待办(to do list)：[GitHub - HeroBlackInk/ultimate-todoist-sync-for-obsidian (kkgithub.com)](https://kkgithub.com/HeroBlackInk/ultimate-todoist-sync-for-obsidian)
 	4. 数据库：dataview，db folder，dataloom
 	5. admonitions
+	6. 发布到web：vercel+digital garden
 
 
 - 以下是插件的一些例子：
@@ -131,6 +132,14 @@ $\sum\limits_{i=1}^n=\sum\limits_{i=1}^n$
 
 > [!note] 寄吧
 > $$\sum\limits_{i=1}^n\sum\limits_{j=1}^nij=\sum\limits_{i=1}^ni\sum\limits_{j=1}^nj=\frac{n^2(n+1)^2}4$$
+
+#### 发布到web
+
+- [obsidian-digital-garden 插件](https://kkgithub.com/oleeskild/obsidian-digital-garden)
+- [digitalgarden 仓库模板](https://github.com/oleeskild/digitalgarden)
+
+
+[流程可参考该链接](https://dg-docs.ole.dev/getting-started/01-getting-started/)
 
 ### 3.主题
 .obsidian/themes/xxx.css 代表一个主题
