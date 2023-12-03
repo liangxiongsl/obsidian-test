@@ -141,6 +141,8 @@ $\sum\limits_{i=1}^n=\sum\limits_{i=1}^n$
 
 [流程可参考该链接](https://dg-docs.ole.dev/getting-started/01-getting-started/)
 
+[本站的链接](https://obsidian-test-phi.vercel.app/)
+
 ### 3.主题
 .obsidian/themes/xxx.css 代表一个主题
 
