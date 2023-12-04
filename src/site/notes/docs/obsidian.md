@@ -3,11 +3,6 @@
 ---
 
 
-!!! ad-note sd
-
-内容
-
---- admonition
 
 ### 1.文档
 
@@ -18,7 +13,7 @@
 [obsidian不就是个记笔记的软件吗_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1yg41147YG/?spm_id_from=trigger_reload&vd_source=208302bb40f651c78a4db5c2fd649412)
 
 
-obsidian拥有强大的插件生态，(前段)程序员友好，关系图谱神经网络等特地
+obsidian拥有强大的插件生态，(前端)程序员友好，关系图谱神经网络等特地 
 
 ### 2.插件
 
@@ -52,7 +47,14 @@ obsidian拥有强大的插件生态，(前段)程序员友好，关系图谱神�
 	2. mermaid：[GitHub - dartungar/obsidian-mermaid: Tools for improved Mermaid.js experience in Obsidian.md (kkgithub.com)](https://kkgithub.com/dartungar/obsidian-mermaid)
 	3. 主题：
 	4. [[docs/obsidian#dataview——笔记查询插件\|dataview]]：[GitHub - blacksmithgu/obsidian-dataview: A high-performance data index and query language over Markdown files, for https://obsidian.md/. (kkgithub.com)](https://kkgithub.com/blacksmithgu/obsidian-dataview)
-
+	5. 笔记拆分：[obsidian-note refactor](https://kkgithub.com/lynchjames/note-refactor-obsidian)
+	6. 关联题目搜索（需要chatgpt api-key）：[smart connection](https://github.com/brianpetro/obsidian-smart-connections)
+	7. tikz绘图：[obsidian-tikzjax](https://kkgithub.com/artisticat1/obsidian-tikzjax)
+	8. 自动补全：[obsidian-various-complements-plugin: This plugin for Obsidian enables you complete words like the auto-completion of IDE. (kkgithub.com)](https://kkgithub.com/tadashi-aikawa/obsidian-various-complements-plugin)
+        	- 补充：[Google10000单词](https://kkgithub.com/first20hours/google-10000-english)
+        	- 
+- d
+    - sd
 
 #### 日记
 
@@ -142,6 +144,143 @@ $\sum\limits_{i=1}^n=\sum\limits_{i=1}^n$
 [流程可参考该链接](https://dg-docs.ole.dev/getting-started/01-getting-started/)
 
 [本站的链接](https://obsidian-test-phi.vercel.app/)
+
+#### tikz绘图示例
+
+[obsidian-tikzjax](https://kkgithub.com/artisticat1/obsidian-tikzjax)
+
+```tikz
+\begin{document}
+  \begin{tikzpicture}[domain=0:4]
+    \draw[very thin,color=gray] (-0.1,-1.1) grid (3.9,3.9);
+    \draw[->] (-0.2,0) -- (4.2,0) node[right] {$x$};
+    \draw[->] (0,-1.2) -- (0,4.2) node[above] {$f(x)$};
+    \draw[color=red]    plot (\x,\x)             node[right] {$f(x) =x$};
+    \draw[color=blue]   plot (\x,{sin(\x r)})    node[right] {$f(x) = \sin x$};
+    \draw[color=orange] plot (\x,{0.05*exp(\x)}) node[right] {$f(x) = \frac{1}{20} \mathrm e^x$};
+    \draw[color=pink] plot (\x,{\x^(0.3*\x)}) node[right] {$f(x) = x^{0.3x}$};
+  \end{tikzpicture}
+\end{document}
+```
+
+```tikz
+\usepackage{circuitikz}
+\begin{document}
+
+\begin{circuitikz}[american, voltage shift=0.5]
+\draw (0,0)
+to[isource, l=$I_0$, v=$V_0$] (0,3)
+to[short, -*, i=$I_0$] (2,3)
+to[R=$R_1$, i>_=$i_1$] (2,0) -- (0,0);
+\draw (2,3) -- (4,3)
+to[R=$R_2$, i>_=$i_2$]
+(4,0) to[short, -*] (2,0);
+\end{circuitikz}
+
+\end{document}
+```
+
+```tikz
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+
+\begin{document}
+
+\begin{tikzpicture}
+\begin{axis}[colormap/viridis]
+\addplot3[
+	surf,
+	samples=18,
+	domain=-3:3
+]
+{exp(-x^2-y^2)*x};
+\end{axis}
+\end{tikzpicture}
+
+\end{document}
+```
+
+```tikz
+\usepackage{tikz-cd}
+
+\begin{document}
+\begin{tikzcd}
+
+    T
+    \arrow[drr, bend left, "x"]
+    \arrow[ddr, bend right, "y"]
+    \arrow[dr, dotted, "{(x,y)}" description] & & \\
+    K & X \times_Z Y \arrow[r, "p"] \arrow[d, "q"]
+    & X \arrow[d, "f"] \\
+    & Y \arrow[r, "g"]
+    & Z
+
+\end{tikzcd}
+
+\quad \quad
+
+\begin{tikzcd}[row sep=2.5em]
+
+A' \arrow[rr,"f'"] \arrow[dr,swap,"a"] \arrow[dd,swap,"g'"] &&
+  B' \arrow[dd,swap,"h'" near start] \arrow[dr,"b"] \\
+& A \arrow[rr,crossing over,"f" near start] &&
+  B \arrow[dd,"h"] \\
+C' \arrow[rr,"k'" near end] \arrow[dr,swap,"c"] && D' \arrow[dr,swap,"d"] \\
+& C \arrow[rr,"k"] \arrow[uu,<-,crossing over,"g" near end]&& D
+
+\end{tikzcd}
+
+\end{document}
+```
+
+```tikz
+\usepackage{chemfig}
+\begin{document}
+
+\chemfig{[:-90]HN(-[::-45](-[::-45]R)=[::+45]O)>[::+45]*4(-(=O)-N*5(-(<:(=[::-60]O)-[::+60]OH)-(<[::+0])(<:[::-108])-S>)--)}
+
+\end{document}
+```
+
+```tikz
+\usepackage{chemfig}
+\begin{document}
+
+\definesubmol\fragment1{
+
+    (-[:#1,0.85,,,draw=none]
+    -[::126]-[::-54](=_#(2pt,2pt)[::180])
+    -[::-70](-[::-56.2,1.07]=^#(2pt,2pt)[::180,1.07])
+    -[::110,0.6](-[::-148,0.60](=^[::180,0.35])-[::-18,1.1])
+    -[::50,1.1](-[::18,0.60]=_[::180,0.35])
+    -[::50,0.6]
+    -[::110])
+    }
+
+\chemfig{
+!\fragment{18}
+!\fragment{90}
+!\fragment{162}
+!\fragment{234}
+!\fragment{306}
+}
+
+\end{document}
+```
+
+#### 多个库共享单个配置
+
+由于一个库内可能有很多插件，会造成存储空间辅导过重，多库共享一个配置就很有必要
+
+一般配置文件总共为 50mb 左右，如果忽略 assets 内的文件，所有库的总存储量极难超过 100mb
+
+在命令行中执行软链接命令：（注：软链接不是 .lnk 文件）
+```cmd
+mklink /d [次库的配置目录] [主库的配置目录]
+```
+
+如：`mklink /d "D:\lx\sub_vault\.obsidian" "D:\lx\main_vault\.obsidian"`
+
 
 ### 3.主题
 .obsidian/themes/xxx.css 代表一个主题
