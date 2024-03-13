@@ -36,9 +36,72 @@ api => [API 参考](https://docs.djangoproject.com/zh-hans/5.0/ref/)
 
 路由在 django 中被称为 **URLconfs**
 
+涉及的包和模块：
+=> `django.urls` => `path()`, `re_path()`, 
+=> `django.http` => `HttpRequest`, `HttpResponse`
+
+#### url 调度器
+
 Django 处理请求的工作方式：
-=> 根据 `HttpRequest` 对象的 `urlconf` 属性（参考[[docs/草稿/后端/python/Django--ex#views\|views->request-response]]），或者 `ROOT_URLCONF` 确定**根路由器**
+=> 根据 `HttpRequest` 对象的 `urlconf` 属性，或者 `ROOT_URLCONF` 确定**根路由器**
 => 根据 `HttpRequest` 的 `path_info` 部分匹配路由器模块中 `urlpatterns` 里的一条路由，并转入下一条**路由器**，或者一个**视图**；若匹配不到路由，则 Django 调用适当的错误处理视图，参见 [[docs/草稿/后端/python/Django--ex#安全\|安全->异常]]
+=> 例子
+```python
+urlpatterns = [
+    path("articles/2003/", views.a),
+    path("articles/<int:year>/", views.b),
+    path("articles/<int:year>/<int:month>/", views.c),
+    path("articles/<int:year>/<int:month>/<slug:slug>/", views.d),
+]
+```
+- `/articles/2005/03/` => 匹配第三项，调用 `views.c(request, year=2005, month=3)`
+- `/articles/2003/` => 匹配第一项，调用 `views.a(request)`
+- `/articles/2003` => 匹配不到
+- `/articles/2003/03/building-a-django-site/` => 匹配第四项，调用 `views.d(request, year=2005, month=3, slug='building-a-django-site')`
+
+**路径转换器** => 在 path 的 `route` 参数中用于指定 `path-params`
+- `<str:path_param>` => 匹配 `[^/]+` 并传递给 `path_param: str` 参数
+- `<int:path_param>` => 匹配自然数 `\d+` 并传递给 `path_param: int` 参数
+- `<slug:path_param>` => 匹配 `[^\x00-\xFF]+`（ASCII 字母、下划线、连字符）并传递给 `path_param: str` 参数
+- `<uuid:path_param>` => 匹配一个格式化的 [UUID](https://docs.python.org/3/library/uuid.html#uuid.UUID)
+- `<path:path_param>` => 匹配 `.+` 并传递给 `path_param: str` 参数
+=> 例子：
+
+**自定义路径转换器** => 定义一个类，其具有 `regex` 属性，`to_python()` 和 `to_url()` 方法 => 然后用 `register_converter(ExampleConverter: class, converter_name: str)` 注册转换器
+- `regex: str` => 指定匹配的模式
+- `to_python(self, value: str): any` => 指定路径参数传递给视图函数形参时的数据
+- `to_url(self, value: any): str` => 指定数据转换为 url 中的路径参数时得到的字符串（即 `to_python()` 的逆变换），通常在调用 `reverse()` 时触发
+=> 例子：
+```python
+class ExampleConverter:
+	regex = "\d{4}"
+	def to_python(self, value):
+		return int(value)
+	def to_url(self, value):
+		return "%04d" % value
+
+from django.urls import path, register_converter
+register_converter(ExampleConverter, "yyyy")
+urlpatterns = [
+	path("<yyyy:param>", ...)
+]
+```
+
+
+正则路由 => `re_path()` => 使用 `(?P<path-param>pattern)` 或 `(pattern)` 进行分组（或者说指定路径参数）
+=> 例子： `re_path(r'^email/(?P<param>\w+@\w+\.\w+)/$', ...)`
+- 嵌套参数 => 
+
+
+
+
+
+#### 附录
+
+| urls 的函数                                                                                                | 用途                      | 参数解释                                   |
+| ------------------------------------------------------------------------------------------------------- | ----------------------- | -------------------------------------- |
+| path(route: str, view: (req: HttpRequest, **path_params) => HttpResponse, args?: dict, name?: str)      | 获取一条匹配规则 => 将匹配的路由转发到视图 | args => 传递给视图的额外数据<br>name => 路由规则的标识符 |
+| re_path(route: regex, view: (req: HttpRequest, **path_params) => HttpResponse, args?: dict, name?: str) |                         |                                        |
 
 
 ### 视图(views)
@@ -60,6 +123,7 @@ Django 处理请求的工作方式：
 > topic：[模型](https://docs.djangoproject.com/zh-hans/5.0/topics/db/models/), [执行查询](https://docs.djangoproject.com/zh-hans/5.0/topics/db/queries/), [聚合](https://docs.djangoproject.com/zh-hans/5.0/topics/db/aggregation/), [搜索](https://docs.djangoproject.com/zh-hans/5.0/topics/db/search/), [管理器](https://docs.djangoproject.com/zh-hans/5.0/topics/db/managers/), [原生sql](https://docs.djangoproject.com/zh-hans/5.0/topics/db/sql/), [数据库事务](https://docs.djangoproject.com/zh-hans/5.0/topics/db/transactions/), [模型关联 API 用法示例](https://docs.djangoproject.com/zh-hans/5.0/topics/db/examples/), [序列化 Django 对象](https://docs.djangoproject.com/zh-hans/5.0/topics/serialization/)
 > ref：[模型](https://docs.djangoproject.com/zh-hans/5.0/ref/models/), [信号](https://docs.djangoproject.com/zh-hans/5.0/ref/signals/), [验证器](https://docs.djangoproject.com/zh-hans/5.0/ref/validators/), 
 
+主要涉及 `django.db.models.Model` 类
 
 
 Django 中只有 `app` 才拥有自己的 `model`，其定义在 `<app>.models` 下（可以是 `.py` 的模块文件，也可以是包的 `__init__.py` 文件）
@@ -118,6 +182,7 @@ Django 中只有 `app` 才拥有自己的 `model`，其定义在 `<app>.models` 
 | GeneratedField(expression, output_field, db_persist=None)                                                  | 数据库底层中由其他字段计算的字段                 |                                                                 |                                       |                                      |
 
 
+##### 表间关系
 
 定义模型间的关系的三个**特殊字段**：
 
@@ -131,7 +196,7 @@ Django 中只有 `app` 才拥有自己的 `model`，其定义在 `<app>.models` 
 - model => **关联模型**
 - through => 自定义**中间模型** => 用于给多对多关系**添加额外字段**
 
-多对多关系的相关方法：
+多方的相关方法：
 ```python
 <model1>.<model2>_set.add(model: Model2, through_defaults: dict)
 <model1>.<model2>_set.create(opt1, ..., through_defaults: dict)
@@ -255,9 +320,105 @@ def save(self, *args, **kwargs):
 
 ### 模型查询
 
+数据库查询相关的包或类
+=> `django.db.models` => `Model`, `ForeignKey`, `ManyToManyField`, `QuerySet`, `F`, `AVG`, `MIN`, `MAX`
+=> `django.db.models.manager` => `Manager`
+=> `django.db.models.fields.json` => `KT`
+
+#### 执行查询
+
+创建或保存对象 =>
+- `<Model>.save(**opts)` => 保存模型对象
+- `<Manager>.create(**attr_opts)` => 创建并保存对象
+=> 例子：
+```python
+# 例1
+user_model = UserModel(username='150',password='62')
+user_model.save()
+# 例2
+UserModel.objects.create(username='150',password='62') # => 会返回对应模型
+```
+
+修改对象 => 
+- `<Model>.<attr> = new_val` => 直接修改
+- `<Model>.<func>()` => 间接修改
+- `<Model>.<many-Model>_set.add(<many-Model1>, ...)` => 添加一个`多方模型`的记录
+- `<Model>.<one-Model> = <one-Model>` => 覆盖一个`一方模型`的记录
+
+
+检索对象 => 用到 QuerySet 类 => 通常通过 `<Model>.objects.all()` 得到
+=> 通过 `get()` 获取单个对象
+=> 通过 `filter()`, `exclude()` 过滤或排除检索到的对象集合
+注：QuerySet 是**惰性的** => 每次过滤都只是在添加限制条件，并非真正执行了 sql，只会在你 “要使用” 时才会执行
+=> 支持**切片**极其**step**语法 => 例如：`<QuerySet>[0]`, `<QuerySet>[0:5]`, `<QuerySet>[::2]`, `<QuerySet>[1::2]`
+注：指定步长后会执行 sql
+
+其中 `filter()`, `exclude()` 等方法支持如下形式的可选参数：
+- `<attr>` => 模型的属性
+- `<attr>__<lookup_type>` => 指定模型属性的各种复杂查询 => `lookup_type` 的常见类型 => `lte`, `gte`. `lt`, `gt`, `exact`, `iexact`, `regex`, `iregex`, `contains`, `icontains`, `startswith`, `endswith`, `istartswith`, `iendswith`, `in`
+- `<one-model>_id` => 关联的表模型的 id
+- `<one-model>__<one-model-attr>` => 指定 `一方模型` 的属性的限制条件
+- `<one-model>__<one-model-attr>__<lookuptype>` => 
+- `<many-model>__<many-model-attr>` => 指定**至少满足一个** `多方模型` 的属性的限制条件
+- `<many-model>__<many-model-attr>__<lookuptype>` => 
+参数值：
+- 常量
+- F 表达式 => `F(attr: str)` => 可以引用当前模型的字段，并进行相关运算
+- 可以使用 `Min`, `Max`, `AVG` 等
+
+缓存问题 => [执行查询 | Django 文档 | Django (djangoproject.com)](https://docs.djangoproject.com/zh-hans/5.0/topics/db/queries/#caching-and-querysets)
+
+#### 异步查询
+
+#### json 查询
+
+json 字段在 `filter()`, `exclude()` 等方法中的参数的组成：
+- 前缀 `<json-attr>`
+- `__<int>` => 索引 json 数组的第 `<int>` 个 json 对象
+- `__<key>` => 索引 json 对象 key 为 `<key>` 的 json 对象
+
+`KT(lookup: str)` => 针对于 json 字段的类似于 `F(lookup: str)` 的函数
+
+json 字段还支持更多的 `lookup_type`：
+- `contains` => 
+- `contained_by` => 
+- `has_key: str` => 含有对应的 key
+- `has_keys: str[]` => 含有给定 key 数组中的所有 key
+- `has_any_keys: str[]` => 含有给定 key 数组中的一个 key
+
+#### 通过 Q 对象完成复杂查询
+[执行查询 | Django 文档 | Django (djangoproject.com)](https://docs.djangoproject.com/zh-hans/5.0/topics/db/queries/#complex-lookups-with-q-objects)
 
 
 
+#### 附录
+
+注：下面的方法加上前缀 `a` 总是可以得到异步版本
+
+| Model 的类属性       | 用途  |
+| ---------------- | --- |
+| objects: Manager |     |
+|                  |     
+
+| Model 的方法                                                                                      | 用途   |
+| ---------------------------------------------------------------------------------------------- | ---- |
+| save(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None): void | 保存记录 |
+|                                                                                                |      |
+
+| Manager 的方法             | 用途          |
+| ----------------------- | ----------- |
+| all(): QuerySet         |             |
+| create(**kwargs): Model | 创建一个对象并保存记录 |
+|                         |             |
+注：Manager 实例通常通过 `Model.objects` 获取
+
+| QuerySet 的方法                     | 用途     |
+| -------------------------------- | ------ |
+| get(**kwargs): Model             | 检索单个对象 |
+| filter(**lookup_args): QuerySet  | 过滤对象   |
+| exclude(**lookup_args): QuerySet | 排除对象   |
+| values(): QuerySet               |        |
+| annotate(): QuerySet             |        |
 
 
 ### 迁移(migrations)
@@ -281,6 +442,10 @@ def save(self, *args, **kwargs):
 ### 安全
 > topic：[Django中的用户认证](https://docs.djangoproject.com/zh-hans/5.0/topics/auth/)，[加密签名](https://docs.djangoproject.com/zh-hans/5.0/topics/signing/), [发送邮件](https://docs.djangoproject.com/zh-hans/5.0/topics/email/), [Django 的安全性](https://docs.djangoproject.com/zh-hans/5.0/topics/security/), [系统检查框架](https://docs.djangoproject.com/zh-hans/5.0/topics/checks/)
 > ref：[点击劫持保护](https://docs.djangoproject.com/zh-hans/5.0/ref/clickjacking/), [系统检查框架](https://docs.djangoproject.com/zh-hans/5.0/ref/checks/),[Django 异常](https://docs.djangoproject.com/zh-hans/5.0/ref/exceptions/)
+
+#### 认证
+
+
 
 
 ### 性能
