@@ -1,14 +1,9 @@
 ---
-标题: obsidian
-创建时间: 2023-11-30 12:42
-修改时间: 2023-12-01 12:09
-tags: null
-备注: null
-其他: null
-dg-home: true
-dg-publish: true
+{"dg-publish":true,"permalink":"/docs//obsidian/","tags":["gardenEntry"]}
 ---
+
 ### 1.文档
+jiba
 
 - [obsidian开发者文档](https://docs.obsidian.md/Home)
 - [obsidian开发者文档](https://docs.obsidian.md/Themes/App+themes/Build+a+theme)
